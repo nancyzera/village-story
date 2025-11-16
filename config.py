@@ -5,10 +5,9 @@ BASE_DIR = Path(__file__).parent
 UPLOAD_FOLDER = BASE_DIR / 'uploads'
 DATABASE_PATH = BASE_DIR / 'stories.db'
 
-QDRANT_HOST = os.getenv('QDRANT_HOST', 'localhost')
-QDRANT_PORT = int(os.getenv('QDRANT_PORT', 6333))
+QDRANT_URL = os.getenv('QDRANT_URL', None)
 QDRANT_API_KEY = os.getenv('QDRANT_API_KEY', None)
-QDRANT_USE_MEMORY = os.getenv('QDRANT_USE_MEMORY', 'true').lower() == 'true'
+QDRANT_USE_MEMORY = os.getenv('QDRANT_USE_MEMORY', 'false').lower() == 'true'
 
 COLLECTION_NAME = 'stories_memory'
 VECTOR_SIZE = 384

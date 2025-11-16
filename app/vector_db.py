@@ -10,12 +10,13 @@ def init_qdrant():
     
     if config.QDRANT_USE_MEMORY:
         qdrant = QdrantClient(":memory:")
-    else:
+    elif config.QDRANT_URL and config.QDRANT_API_KEY:
         qdrant = QdrantClient(
-            host=config.QDRANT_HOST,
-            port=config.QDRANT_PORT,
+            url=config.QDRANT_URL,
             api_key=config.QDRANT_API_KEY
         )
+    else:
+        qdrant = QdrantClient(":memory:")
     
     try:
         qdrant.get_collection(config.COLLECTION_NAME)
