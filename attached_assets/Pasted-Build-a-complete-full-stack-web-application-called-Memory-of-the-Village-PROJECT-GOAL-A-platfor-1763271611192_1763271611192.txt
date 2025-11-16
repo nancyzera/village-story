@@ -1,0 +1,94 @@
+Build a complete full-stack web application called “Memory of the Village”.
+
+PROJECT GOAL:
+A platform where users upload voice stories or write text stories, and the system stores them as text, emotion, and topic embeddings in Qdrant. Users can later search for stories semantically and get meaningful results.
+
+TECH STACK:
+- Backend: Python Flask
+- Vector Database: Qdrant (cloud or local)
+- Embeddings: SentenceTransformers (text) + Wav2Vec or Whisper (audio)
+- Frontend: HTML, TailwindCSS, JavaScript
+- Database: SQLite for users + metadata
+- API: REST endpoints for story upload, embedding processing, search, and retrieval
+- Storage: local /uploads folder for audio files
+
+REQUIREMENTS:
+
+1. FILE STRUCTURE
+Create the following structure automatically:
+- /app
+    - main.py (Flask app)
+    - models.py
+    - embeddings.py
+    - qdrant_client.py
+    - routes/
+        - upload_routes.py
+        - search_routes.py
+    - utils/
+        - audio_to_text.py
+        - text_cleaner.py
+- /static
+    - tailwind.css
+- /templates
+    - index.html
+    - upload.html
+    - search.html
+    - story_page.html
+- /uploads (store audio)
+- config.py
+
+2. BACKEND FEATURES
+- User uploads audio or text.
+- Audio → transcribed to text (use Whisper).
+- Extract:
+    * text embedding
+    * emotion embedding
+    * topic embedding
+- Store the embeddings + metadata in Qdrant.
+- Provide an API endpoint to search using semantic vector search.
+- Return nearest stories ranked by similarity.
+- Provide endpoint to fetch and display full story.
+
+3. QDRANT SETUP
+Create a collection “stories_memory” with fields:
+- story_id (uuid)
+- story_text
+- transcription_text
+- speaker_name
+- district
+- emotion_vector
+- topic_vector
+- text_vector
+- timestamp
+
+4. FRONTEND PAGES
+- index.html → “Memory of the Village” home page
+- upload.html → upload voice or type text
+- search.html → text search bar with live results
+- story_page.html → display full story
+
+Use TailwindCSS for clean minimal UI.
+
+5. LOGIC FLOW
+When a user uploads a story:
+    - If audio: convert to text
+    - Clean + normalize text
+    - Generate three embeddings
+    - Save all vectors + metadata to Qdrant
+    - Save audio file locally
+
+Search:
+    - Convert user query to embedding
+    - Search Qdrant for similarity
+    - Return list of stories
+    - Show stories with title, summary, emotion tag, similarity score
+
+6. EXTRA FEATURES
+- Add pagination to results
+- Add a basic admin panel route (/admin)
+- Include error handling everywhere
+- Include README.md with instructions
+- Make backend and frontend run automatically with Replit
+
+Generate all files and code needed.
+Fix any errors encountered.
