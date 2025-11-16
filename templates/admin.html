@@ -1,110 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Memory of the Village</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Memory of the Village</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @keyframes float { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-6px);} }
+  .animate-float { animation: float 3s ease-in-out infinite; }
+  .glass {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    transform: translateY(-3px);
+    transition: all 0.3s ease-in-out;
+  }
+</style>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 min-h-screen text-white">
-    <nav class="glass sticky top-0 z-50 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold gradient-text">🌟 Memory of the Village</span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Home</a>
-                    <a href="/upload" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Upload</a>
-                    <a href="/search" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Search</a>
-                    <a href="/settings" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Settings</a>
-                    <a href="/admin" class="text-purple-400 px-3 py-2 rounded-lg transition-all bg-white/10">Admin</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 class="text-4xl font-bold mb-8 gradient-text">📊 Admin Panel</h2>
-
-        <div class="grid md:grid-cols-3 gap-6 mb-8">
-            <div class="glass rounded-2xl p-6 shadow-lg">
-                <div class="text-5xl mb-3">📚</div>
-                <h3 class="text-3xl font-bold text-white mb-1">{{ total_stories }}</h3>
-                <p class="text-gray-400">Total Stories</p>
-            </div>
-            
-            <div class="glass rounded-2xl p-6 shadow-lg">
-                <div class="text-5xl mb-3">🗄️</div>
-                <h3 class="text-3xl font-bold text-white mb-1">{{ qdrant_info.points_count or 0 }}</h3>
-                <p class="text-gray-400">Vector Points</p>
-            </div>
-            
-            <div class="glass rounded-2xl p-6 shadow-lg">
-                <div class="text-5xl mb-3">✅</div>
-                <h3 class="text-3xl font-bold text-white mb-1">{{ qdrant_info.status or 'Active' }}</h3>
-                <p class="text-gray-400">System Status</p>
-            </div>
-        </div>
-
-        <div class="glass rounded-2xl p-6 shadow-lg">
-            <h3 class="text-2xl font-bold text-white mb-6">Recent Stories</h3>
-            
-            {% if stories %}
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead>
-                        <tr class="border-b border-white/10">
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Speaker</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">District</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Emotion</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/10">
-                        {% for story in stories %}
-                        <tr class="hover:bg-white/5 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{{ story.speaker_name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ story.district or 'N/A' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                                {{ story.file_type or 'text' == 'audio' and '🎤 Audio' or '📝 Text' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                                    {{ story.emotion_tag or 'neutral' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ story.created_at }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="/story/{{ story.id }}" class="text-purple-400 hover:text-purple-300 font-semibold">View →</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-12">
-                <div class="text-6xl mb-4">📭</div>
-                <p class="text-gray-400 text-lg">No stories uploaded yet.</p>
-            </div>
-            {% endif %}
-        </div>
+<nav class="glass sticky top-0 z-50 shadow-md py-3">
+  <div class="max-w-7xl mx-auto flex justify-between items-center px-6">
+    <span class="text-2xl font-bold">🌿 Memory of the Village</span>
+    <div class="space-x-4">
+      <a href="/" class="hover:text-purple-400 transition">Home</a>
+      <a href="/upload" class="hover:text-purple-400 transition">Upload</a>
+      <a href="/search" class="hover:text-purple-400 transition">Search</a>
+ <!--     <a href="/settings" class="hover:text-purple-400 transition">Settings<a/>-->
+      <a href="/admin" class="text-purple-400 px-2 py-1 rounded bg-white/10">Admin</a>
     </div>
+  </div>
+</nav>
+
+
+<div class="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-6">
+  <div class="glass rounded-xl p-6 text-center hover-glow">
+    <div class="text-5xl mb-2 animate-float">📚</div>
+    <h3 class="text-3xl font-bold">{{ total_stories }}</h3>
+    <p class="text-gray-400">Total Stories</p>
+  </div>
+  <div class="glass rounded-xl p-6 text-center hover-glow">
+    <div class="text-5xl mb-2 animate-float">🗄️</div>
+    <h3 class="text-3xl font-bold">{{ qdrant_info.points_count or 0 }}</h3>
+    <p class="text-gray-400">Vector Points</p>
+  </div>
+  <div class="glass rounded-xl p-6 text-center hover-glow">
+    <div class="text-5xl mb-2 animate-float">✅</div>
+    <h3 class="text-3xl font-bold">{{ qdrant_info.status or 'Active' }}</h3>
+    <p class="text-gray-400">System Status</p>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-6 py-12 glass rounded-xl p-6 shadow-lg">
+  <h2 class="text-2xl font-bold mb-6">Recent Stories</h2>
+
+  {% if stories %}
+  <div class="overflow-x-auto">
+    <table class="min-w-full">
+      <thead>
+        <tr class="border-b border-white/10 text-left">
+          <th class="px-4 py-2 text-sm text-gray-400">Speaker</th>
+          <th class="px-4 py-2 text-sm text-gray-400">District</th>
+          <th class="px-4 py-2 text-sm text-gray-400">Type</th>
+          <th class="px-4 py-2 text-sm text-gray-400">Emotion</th>
+          <th class="px-4 py-2 text-sm text-gray-400">Date</th>
+          <th class="px-4 py-2 text-sm text-gray-400">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10">
+        {% for story in stories %}
+        <tr class="hover:bg-white/5 transition-colors">
+          <td class="px-4 py-2 text-sm font-medium">{{ story.speaker_name }}</td>
+          <td class="px-4 py-2 text-sm text-gray-400">{{ story.district or 'N/A' }}</td>
+          <td class="px-4 py-2 text-sm text-gray-400">
+            {{ story.file_type or 'text' == 'audio' and '🎤 Audio' or '📝 Text' }}
+          </td>
+          <td class="px-4 py-2 text-sm">
+            <span class="px-2 py-1 text-xs rounded-full bg-white/10 text-gray-200">{{ story.emotion_tag or 'neutral' }}</span>
+          </td>
+          <td class="px-4 py-2 text-sm text-gray-400">{{ story.created_at }}</td>
+          <td class="px-4 py-2 text-sm">
+            <a href="/story/{{ story.id }}" class="text-purple-400 hover:text-purple-300 font-semibold">View →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-12">
+    <div class="text-6xl mb-4">📭</div>
+    <p class="text-gray-400 text-lg">No stories uploaded yet.</p>
+  </div>
+  {% endif %}
+</div>
+
 </body>
 </html>

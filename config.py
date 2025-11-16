@@ -17,4 +17,4 @@ MAX_FILE_SIZE = 50 * 1024 * 1024
 
 SECRET_KEY = os.getenv('SESSION_SECRET', 'dev-secret-key-change-in-production')
 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY',"")
