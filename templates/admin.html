@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Memory of the Village</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-indigo-600">Memory of the Village</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Home</a>
+                    <a href="/upload" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Upload Story</a>
+                    <a href="/search" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Search</a>
+                    <a href="/admin" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Admin Panel</h2>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="text-indigo-600 text-3xl mb-2">📚</div>
+                <h3 class="text-2xl font-bold text-gray-900">{{ total_stories }}</h3>
+                <p class="text-gray-600">Total Stories</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="text-indigo-600 text-3xl mb-2">🗄️</div>
+                <h3 class="text-2xl font-bold text-gray-900">{{ qdrant_info.points_count or 0 }}</h3>
+                <p class="text-gray-600">Vector Points</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="text-indigo-600 text-3xl mb-2">✅</div>
+                <h3 class="text-2xl font-bold text-gray-900">{{ qdrant_info.status or 'Active' }}</h3>
+                <p class="text-gray-600">System Status</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Recent Stories</h3>
+            
+            {% if stories %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Speaker</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">District</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emotion</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for story in stories %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ story.speaker_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ story.district or 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ story.file_type or 'text' == 'audio' and '🎤 Audio' or '📝 Text' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
+                                    {{ story.emotion_tag or 'neutral' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ story.created_at }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <a href="/story/{{ story.id }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-600 text-center py-8">No stories uploaded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

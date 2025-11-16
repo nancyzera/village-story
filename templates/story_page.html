@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ story.speaker_name }}'s Story - Memory of the Village</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-indigo-600">Memory of the Village</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Home</a>
+                    <a href="/upload" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Upload Story</a>
+                    <a href="/search" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Search</a>
+                    <a href="/admin" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="mb-4">
+            <a href="/search" class="text-indigo-600 hover:text-indigo-800">← Back to Search</a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="mb-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ story.speaker_name }}</h1>
+                        <p class="text-gray-600">{{ story.district or 'Unknown Location' }}</p>
+                    </div>
+                    {% if story.emotion_tag %}
+                    <span class="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-semibold">
+                        {{ story.emotion_tag }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6 mb-6">
+                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                    <span>{{ story.file_type or 'text' == 'audio' and '🎤 Audio Story' or '📝 Written Story' }}</span>
+                    <span>•</span>
+                    <span>{{ story.created_at }}</span>
+                </div>
+
+                {% if story.transcription_text %}
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Transcription</h3>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-gray-700 whitespace-pre-line">{{ story.transcription_text }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Story</h3>
+                    <div class="prose max-w-none">
+                        <p class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">{{ story.story_text }}</p>
+                    </div>
+                </div>
+
+                {% if story.audio_filename %}
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Original Audio</h3>
+                    <audio controls class="w-full">
+                        <source src="/uploads/{{ story.audio_filename }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+                <div class="bg-indigo-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-600">
+                        <strong>Story ID:</strong> {{ story.id }}<br>
+                        This story is part of the Memory of the Village archive.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

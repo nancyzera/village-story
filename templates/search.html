@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Stories - Memory of the Village</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-indigo-600">Memory of the Village</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Home</a>
+                    <a href="/upload" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Upload Story</a>
+                    <a href="/search" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Search</a>
+                    <a href="/admin" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Search Stories</h2>
+            
+            <div class="mb-4">
+                <input type="text" id="searchInput" 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="Search for stories by meaning, themes, or content...">
+            </div>
+
+            <div class="flex space-x-4 mb-4">
+                <select id="searchType" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="text">Text Search</option>
+                    <option value="emotion">Emotion Search</option>
+                    <option value="topic">Topic Search</option>
+                </select>
+                
+                <button onclick="searchStories()" 
+                        class="px-8 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    Search
+                </button>
+            </div>
+
+            <div id="messageDiv" class="hidden mt-4 p-4 rounded"></div>
+        </div>
+
+        <div id="loading" class="hidden text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <p class="text-gray-600 mt-4">Searching stories...</p>
+        </div>
+
+        <div id="resultsContainer"></div>
+    </div>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchStories();
+            }
+        });
+
+        async function searchStories() {
+            const query = document.getElementById('searchInput').value.trim();
+            const searchType = document.getElementById('searchType').value;
+            const messageDiv = document.getElementById('messageDiv');
+            const loading = document.getElementById('loading');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            if (!query) {
+                messageDiv.className = 'mt-4 p-4 rounded bg-yellow-100 text-yellow-800';
+                messageDiv.textContent = 'Please enter a search query';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+
+            messageDiv.classList.add('hidden');
+            loading.classList.remove('hidden');
+            resultsContainer.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        limit: 20,
+                        search_type: searchType
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayResults(data.results, data.query);
+                } else {
+                    messageDiv.className = 'mt-4 p-4 rounded bg-red-100 text-red-800';
+                    messageDiv.textContent = `Error: ${data.error}`;
+                    messageDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                messageDiv.className = 'mt-4 p-4 rounded bg-red-100 text-red-800';
+                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.classList.remove('hidden');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function displayResults(results, query) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                        <p class="text-gray-600 text-lg">No stories found for "${query}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="mb-4 text-gray-700">
+                    Found <strong>${results.length}</strong> stories for "<strong>${query}</strong>"
+                </div>
+            `;
+
+            results.forEach(result => {
+                const emotionColors = {
+                    'joy': 'bg-yellow-100 text-yellow-800',
+                    'sadness': 'bg-blue-100 text-blue-800',
+                    'nostalgia': 'bg-purple-100 text-purple-800',
+                    'hope': 'bg-green-100 text-green-800',
+                    'fear': 'bg-red-100 text-red-800',
+                    'neutral': 'bg-gray-100 text-gray-800'
+                };
+
+                const emotionClass = emotionColors[result.emotion_tag] || emotionColors['neutral'];
+
+                html += `
+                    <div class="bg-white rounded-lg shadow-lg p-6 mb-4 hover:shadow-xl transition cursor-pointer"
+                         onclick="window.location.href='/story/${result.story_id}'">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">${result.speaker_name}</h3>
+                                <p class="text-sm text-gray-500">${result.district || 'Unknown'}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-3 py-1 rounded-full text-sm ${emotionClass}">
+                                    ${result.emotion_tag}
+                                </span>
+                                <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
+                                    ${(result.similarity_score * 100).toFixed(1)}% match
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 mb-2">${result.summary}</p>
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <span>${result.file_type === 'audio' ? '🎤 Audio' : '📝 Text'}</span>
+                            <span class="text-indigo-600 hover:text-indigo-800 font-semibold">View Full Story →</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsContainer.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
