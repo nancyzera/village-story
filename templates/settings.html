@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Memory of the Village</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 min-h-screen text-white">
+    <nav class="glass sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold gradient-text">🌟 Memory of the Village</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Home</a>
+                    <a href="/upload" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Upload</a>
+                    <a href="/search" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Search</a>
+                    <a href="/settings" class="text-purple-400 px-3 py-2 rounded-lg transition-all bg-white/10">Settings</a>
+                    <a href="/admin" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h2 class="text-4xl font-bold mb-8 gradient-text">⚙️ Settings & Configuration</h2>
+
+        <div class="glass rounded-2xl p-8 mb-6">
+            <h3 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="mr-3">🔑</span>
+                OpenAI API Key Configuration
+            </h3>
+            
+            <div class="mb-6">
+                <div class="flex items-center mb-4">
+                    <span class="text-gray-300 mr-3">Status:</span>
+                    {% if openai_configured %}
+                    <span class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg border border-green-500/50 flex items-center">
+                        <span class="mr-2">✓</span> API Key Configured
+                    </span>
+                    {% else %}
+                    <span class="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg border border-red-500/50 flex items-center">
+                        <span class="mr-2">⚠</span> API Key Not Configured
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl p-6 border border-purple-500/30 mb-6">
+                <h4 class="text-xl font-semibold mb-3 text-purple-300">🔒 How to Add Your OpenAI API Key Securely</h4>
+                <p class="text-gray-300 mb-4">For security reasons, API keys are stored in Replit Secrets, not in the application code. Follow these steps:</p>
+                
+                <ol class="space-y-3 text-gray-300">
+                    <li class="flex items-start">
+                        <span class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">1</span>
+                        <span>Click the <strong class="text-white">🔒 Secrets</strong> tab in the left sidebar of Replit</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">2</span>
+                        <span>Click <strong class="text-white">"+ New Secret"</strong></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">3</span>
+                        <span>Set the <strong class="text-white">Key</strong> to: <code class="bg-black/30 px-2 py-1 rounded text-green-400">OPENAI_API_KEY</code></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">4</span>
+                        <span>Paste your OpenAI API key in the <strong class="text-white">Value</strong> field</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">5</span>
+                        <span>Click <strong class="text-white">"Save"</strong> and the app will automatically restart</span>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="bg-blue-500/10 rounded-xl p-4 border border-blue-500/30">
+                <h5 class="font-semibold mb-2 text-blue-300">📝 Don't have an OpenAI API key?</h5>
+                <p class="text-gray-300 mb-3">Get your API key from OpenAI:</p>
+                <a href="https://platform.openai.com/api-keys" target="_blank" 
+                   class="inline-block bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all">
+                    Get OpenAI API Key →
+                </a>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl p-8 mb-6">
+            <h3 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="mr-3">🗄️</span>
+                Qdrant Database Status
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white/5 rounded-lg p-4">
+                    <div class="text-gray-400 text-sm mb-1">Connection Type</div>
+                    <div class="text-xl font-semibold">
+                        {% if qdrant_url %}
+                        <span class="text-green-400">☁️ Cloud Qdrant</span>
+                        {% else %}
+                        <span class="text-yellow-400">💾 In-Memory</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="bg-white/5 rounded-lg p-4">
+                    <div class="text-gray-400 text-sm mb-1">Status</div>
+                    <div class="text-xl font-semibold text-green-400">✓ Connected</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl p-8">
+            <h3 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="mr-3">ℹ️</span>
+                What the API Key Enables
+            </h3>
+            
+            <div class="space-y-3 text-gray-300">
+                <div class="flex items-start">
+                    <span class="text-purple-400 mr-3">✓</span>
+                    <span><strong class="text-white">Audio Transcription:</strong> Automatic transcription of voice recordings using Whisper AI</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="text-purple-400 mr-3">✓</span>
+                    <span><strong class="text-white">Text Embeddings:</strong> Generate semantic embeddings for intelligent search</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="text-purple-400 mr-3">✓</span>
+                    <span><strong class="text-white">Emotion Detection:</strong> AI-powered emotional tone analysis</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="text-purple-400 mr-3">✓</span>
+                    <span><strong class="text-white">Topic Analysis:</strong> Automatic theme extraction from stories</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

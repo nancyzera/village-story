@@ -5,84 +5,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory of the Village</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <nav class="bg-white shadow-lg">
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 min-h-screen text-white">
+    <nav class="glass sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <h1 class="text-2xl font-bold text-indigo-600">Memory of the Village</h1>
+                    <span class="text-2xl font-bold gradient-text">🌟 Memory of the Village</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Home</a>
-                    <a href="/upload" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Upload Story</a>
-                    <a href="/search" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Search</a>
-                    <a href="/admin" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Admin</a>
+                    <a href="/" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Home</a>
+                    <a href="/upload" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Upload</a>
+                    <a href="/search" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Search</a>
+                    <a href="/settings" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Settings</a>
+                    <a href="/admin" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Admin</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center mb-12">
-            <h2 class="text-5xl font-extrabold text-gray-900 mb-4">
-                Preserve Your Village Stories
-            </h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                A platform to capture, preserve, and discover the rich oral histories and memories of our community.
-                Upload voice stories or write text stories, and search through them semantically.
+        <div class="text-center mb-16">
+            <h1 class="text-6xl font-extrabold mb-6 animate-float">
+                <span class="gradient-text">Preserve Your Village Stories</span>
+            </h1>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                A futuristic platform powered by AI to capture, preserve, and discover the rich oral histories and memories of our community through semantic search.
             </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8 mb-12">
-            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
-                <div class="text-indigo-600 text-4xl mb-4">🎤</div>
-                <h3 class="text-xl font-bold mb-2">Upload Stories</h3>
-                <p class="text-gray-600 mb-4">Share your memories through voice recordings or written text. Every story matters.</p>
-                <a href="/upload" class="text-indigo-600 hover:text-indigo-800 font-semibold">Upload Now →</a>
+        <div class="grid md:grid-cols-3 gap-8 mb-16">
+            <div class="glass rounded-2xl p-8 hover:scale-105 transition-transform duration-300 animate-glow">
+                <div class="text-6xl mb-6 animate-float">🎤</div>
+                <h3 class="text-2xl font-bold mb-4 gradient-text">Upload Stories</h3>
+                <p class="text-gray-300 mb-6">Share your memories through voice recordings or written text. AI-powered transcription makes it seamless.</p>
+                <a href="/upload" class="inline-block bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all">
+                    Upload Now →
+                </a>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
-                <div class="text-indigo-600 text-4xl mb-4">🔍</div>
-                <h3 class="text-xl font-bold mb-2">Search Semantically</h3>
-                <p class="text-gray-600 mb-4">Find stories by meaning, not just keywords. Discover connections across memories.</p>
-                <a href="/search" class="text-indigo-600 hover:text-indigo-800 font-semibold">Search Now →</a>
+            <div class="glass rounded-2xl p-8 hover:scale-105 transition-transform duration-300 animate-glow" style="animation-delay: 0.2s;">
+                <div class="text-6xl mb-6 animate-float" style="animation-delay: 0.5s;">🔍</div>
+                <h3 class="text-2xl font-bold mb-4 gradient-text">Semantic Search</h3>
+                <p class="text-gray-300 mb-6">Find stories by meaning, emotion, or theme. Our AI understands context beyond keywords.</p>
+                <a href="/search" class="inline-block bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all">
+                    Search Now →
+                </a>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
-                <div class="text-indigo-600 text-4xl mb-4">💝</div>
-                <h3 class="text-xl font-bold mb-2">Preserve History</h3>
-                <p class="text-gray-600 mb-4">Keep village memories alive for future generations with AI-powered organization.</p>
-                <a href="/admin" class="text-indigo-600 hover:text-indigo-800 font-semibold">View Archive →</a>
+            <div class="glass rounded-2xl p-8 hover:scale-105 transition-transform duration-300 animate-glow" style="animation-delay: 0.4s;">
+                <div class="text-6xl mb-6 animate-float" style="animation-delay: 1s;">💾</div>
+                <h3 class="text-2xl font-bold mb-4 gradient-text">Cloud Storage</h3>
+                <p class="text-gray-300 mb-6">Stories stored securely in the cloud with vector embeddings for intelligent retrieval.</p>
+                <a href="/admin" class="inline-block bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all">
+                    View Archive →
+                </a>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
-            <h3 class="text-2xl font-bold mb-4">How It Works</h3>
-            <div class="grid md:grid-cols-4 gap-6">
-                <div>
-                    <div class="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 text-indigo-600 font-bold">1</div>
-                    <p class="text-gray-700">Upload your story as voice or text</p>
+        <div class="glass rounded-2xl p-10 mb-12">
+            <h3 class="text-3xl font-bold mb-8 text-center gradient-text">How It Works</h3>
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
+                    <h4 class="font-semibold text-lg mb-2">Upload</h4>
+                    <p class="text-gray-400 text-sm">Record or write your story</p>
                 </div>
-                <div>
-                    <div class="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 text-indigo-600 font-bold">2</div>
-                    <p class="text-gray-700">AI transcribes and analyzes content</p>
+                <div class="text-center">
+                    <div class="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
+                    <h4 class="font-semibold text-lg mb-2">AI Processing</h4>
+                    <p class="text-gray-400 text-sm">Transcription & analysis</p>
                 </div>
-                <div>
-                    <div class="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 text-indigo-600 font-bold">3</div>
-                    <p class="text-gray-700">Stories are embedded and stored</p>
+                <div class="text-center">
+                    <div class="bg-gradient-to-br from-green-500 to-emerald-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div>
+                    <h4 class="font-semibold text-lg mb-2">Vector Storage</h4>
+                    <p class="text-gray-400 text-sm">Cloud embedding storage</p>
                 </div>
-                <div>
-                    <div class="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 text-indigo-600 font-bold">4</div>
-                    <p class="text-gray-700">Search and discover semantically</p>
+                <div class="text-center">
+                    <div class="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">4</div>
+                    <h4 class="font-semibold text-lg mb-2">Discover</h4>
+                    <p class="text-gray-400 text-sm">Semantic search results</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl p-8 text-center">
+            <h3 class="text-2xl font-bold mb-4 gradient-text">Powered by Advanced AI</h3>
+            <div class="flex justify-center space-x-6 text-gray-300">
+                <div class="flex items-center">
+                    <span class="text-green-400 mr-2">✓</span>
+                    <span>OpenAI Whisper</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-green-400 mr-2">✓</span>
+                    <span>Vector Embeddings</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-green-400 mr-2">✓</span>
+                    <span>Qdrant Cloud</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-green-400 mr-2">✓</span>
+                    <span>Emotion Detection</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="bg-white mt-12 py-6 border-t">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-600">
-            <p>Memory of the Village - Preserving stories for future generations</p>
+    <footer class="glass mt-12 py-6 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400">
+            <p>Memory of the Village - Preserving stories for future generations with AI</p>
         </div>
     </footer>
 </body>

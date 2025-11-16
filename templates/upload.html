@@ -5,82 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Story - Memory of the Village</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <nav class="bg-white shadow-lg">
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 min-h-screen text-white">
+    <nav class="glass sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <h1 class="text-2xl font-bold text-indigo-600">Memory of the Village</h1>
+                    <span class="text-2xl font-bold gradient-text">🌟 Memory of the Village</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Home</a>
-                    <a href="/upload" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Upload Story</a>
-                    <a href="/search" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Search</a>
-                    <a href="/admin" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Admin</a>
+                    <a href="/" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Home</a>
+                    <a href="/upload" class="text-purple-400 px-3 py-2 rounded-lg transition-all bg-white/10">Upload</a>
+                    <a href="/search" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Search</a>
+                    <a href="/settings" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Settings</a>
+                    <a href="/admin" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Admin</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="bg-white rounded-lg shadow-lg p-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">Share Your Story</h2>
+        <div class="glass rounded-2xl p-8 shadow-2xl">
+            <h2 class="text-4xl font-bold mb-6 gradient-text">📝 Share Your Story</h2>
             
-            <div id="messageDiv" class="hidden mb-4 p-4 rounded"></div>
+            <div id="messageDiv" class="hidden mb-4 p-4 rounded-lg"></div>
 
             <form id="uploadForm" enctype="multipart/form-data">
                 <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Speaker Name *</label>
+                    <label class="block text-gray-300 font-semibold mb-2">Speaker Name *</label>
                     <input type="text" name="speaker_name" id="speaker_name" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                           class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500"
                            placeholder="Enter your name">
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">District/Village</label>
+                    <label class="block text-gray-300 font-semibold mb-2">District/Village</label>
                     <input type="text" name="district" id="district"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                           class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500"
                            placeholder="Enter your district or village">
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Upload Method</label>
+                    <label class="block text-gray-300 font-semibold mb-3">Upload Method</label>
                     <div class="flex space-x-4 mb-4">
                         <button type="button" id="textBtn" onclick="showTextInput()"
-                                class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                            Write Text
+                                class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg">
+                            📝 Write Text
                         </button>
                         <button type="button" id="audioBtn" onclick="showAudioInput()"
-                                class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
-                            Upload Audio
+                                class="flex-1 px-6 py-3 bg-white/10 text-gray-300 rounded-lg font-semibold hover:bg-white/20 transition-all border border-white/20">
+                            🎤 Upload Audio
                         </button>
                     </div>
                 </div>
 
                 <div id="textInput" class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Your Story</label>
+                    <label class="block text-gray-300 font-semibold mb-2">Your Story</label>
                     <textarea name="story_text" id="story_text" rows="8"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500"
                               placeholder="Write your story here..."></textarea>
                 </div>
 
                 <div id="audioInput" class="mb-6 hidden">
-                    <label class="block text-gray-700 font-semibold mb-2">Audio File</label>
+                    <label class="block text-gray-300 font-semibold mb-2">Audio File</label>
                     <input type="file" name="audio_file" id="audio_file" accept=".mp3,.wav,.ogg,.m4a,.flac"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <p class="text-sm text-gray-500 mt-2">Accepted formats: MP3, WAV, OGG, M4A, FLAC (max 50MB)</p>
+                           class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-purple-500 file:to-pink-500 file:text-white file:cursor-pointer">
+                    <p class="text-sm text-gray-400 mt-2">Accepted: MP3, WAV, OGG, M4A, FLAC (max 50MB)</p>
                 </div>
 
                 <button type="submit" id="submitBtn"
-                        class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition">
-                    Upload Story
+                        class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg text-lg">
+                    🚀 Upload Story
                 </button>
             </form>
 
-            <div id="loading" class="hidden mt-4 text-center">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                <p class="text-gray-600 mt-2">Processing your story...</p>
+            <div id="loading" class="hidden mt-6 text-center">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+                <p class="text-gray-300 mt-4 text-lg">Processing your story with AI...</p>
             </div>
         </div>
     </div>
@@ -92,20 +106,16 @@
             currentMode = 'text';
             document.getElementById('textInput').classList.remove('hidden');
             document.getElementById('audioInput').classList.add('hidden');
-            document.getElementById('textBtn').classList.add('bg-indigo-600', 'text-white');
-            document.getElementById('textBtn').classList.remove('bg-gray-300', 'text-gray-700');
-            document.getElementById('audioBtn').classList.remove('bg-indigo-600', 'text-white');
-            document.getElementById('audioBtn').classList.add('bg-gray-300', 'text-gray-700');
+            document.getElementById('textBtn').className = 'flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg';
+            document.getElementById('audioBtn').className = 'flex-1 px-6 py-3 bg-white/10 text-gray-300 rounded-lg font-semibold hover:bg-white/20 transition-all border border-white/20';
         }
 
         function showAudioInput() {
             currentMode = 'audio';
             document.getElementById('audioInput').classList.remove('hidden');
             document.getElementById('textInput').classList.add('hidden');
-            document.getElementById('audioBtn').classList.add('bg-indigo-600', 'text-white');
-            document.getElementById('audioBtn').classList.remove('bg-gray-300', 'text-gray-700');
-            document.getElementById('textBtn').classList.remove('bg-indigo-600', 'text-white');
-            document.getElementById('textBtn').classList.add('bg-gray-300', 'text-gray-700');
+            document.getElementById('audioBtn').className = 'flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg';
+            document.getElementById('textBtn').className = 'flex-1 px-6 py-3 bg-white/10 text-gray-300 rounded-lg font-semibold hover:bg-white/20 transition-all border border-white/20';
         }
 
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
@@ -129,18 +139,18 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    messageDiv.className = 'mb-4 p-4 rounded bg-green-100 text-green-800';
-                    messageDiv.textContent = `Success! Story uploaded with emotion: ${data.emotion_tag}`;
+                    messageDiv.className = 'mb-4 p-4 rounded-lg bg-green-500/20 text-green-300 border border-green-500/50';
+                    messageDiv.innerHTML = `<strong>✓ Success!</strong> Story uploaded with emotion: <span class="font-bold">${data.emotion_tag}</span>`;
                     messageDiv.classList.remove('hidden');
                     e.target.reset();
                 } else {
-                    messageDiv.className = 'mb-4 p-4 rounded bg-red-100 text-red-800';
-                    messageDiv.textContent = `Error: ${data.error}`;
+                    messageDiv.className = 'mb-4 p-4 rounded-lg bg-red-500/20 text-red-300 border border-red-500/50';
+                    messageDiv.innerHTML = `<strong>⚠ Error:</strong> ${data.error}`;
                     messageDiv.classList.remove('hidden');
                 }
             } catch (error) {
-                messageDiv.className = 'mb-4 p-4 rounded bg-red-100 text-red-800';
-                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.className = 'mb-4 p-4 rounded-lg bg-red-500/20 text-red-300 border border-red-500/50';
+                messageDiv.innerHTML = `<strong>⚠ Error:</strong> ${error.message}`;
                 messageDiv.classList.remove('hidden');
             } finally {
                 loading.classList.add('hidden');

@@ -26,6 +26,12 @@ app.register_blueprint(search_bp)
 def index():
     return render_template('index.html')
 
+@app.route('/settings')
+def settings():
+    return render_template('settings.html',
+                         openai_configured=bool(config.OPENAI_API_KEY),
+                         qdrant_url=config.QDRANT_URL)
+
 @app.route('/admin')
 def admin():
     try:

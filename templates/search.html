@@ -5,53 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Stories - Memory of the Village</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <nav class="bg-white shadow-lg">
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 min-h-screen text-white">
+    <nav class="glass sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <h1 class="text-2xl font-bold text-indigo-600">Memory of the Village</h1>
+                    <span class="text-2xl font-bold gradient-text">🌟 Memory of the Village</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Home</a>
-                    <a href="/upload" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Upload Story</a>
-                    <a href="/search" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Search</a>
-                    <a href="/admin" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md">Admin</a>
+                    <a href="/" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Home</a>
+                    <a href="/upload" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Upload</a>
+                    <a href="/search" class="text-purple-400 px-3 py-2 rounded-lg transition-all bg-white/10">Search</a>
+                    <a href="/settings" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Settings</a>
+                    <a href="/admin" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Admin</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">Search Stories</h2>
+        <div class="glass rounded-2xl p-8 mb-6 shadow-2xl">
+            <h2 class="text-4xl font-bold mb-6 gradient-text">🔍 Search Stories</h2>
             
             <div class="mb-4">
                 <input type="text" id="searchInput" 
-                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       class="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500 text-lg"
                        placeholder="Search for stories by meaning, themes, or content...">
             </div>
 
             <div class="flex space-x-4 mb-4">
-                <select id="searchType" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="text">Text Search</option>
-                    <option value="emotion">Emotion Search</option>
-                    <option value="topic">Topic Search</option>
+                <select id="searchType" class="px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white">
+                    <option value="text">🔤 Text Search</option>
+                    <option value="emotion">💭 Emotion Search</option>
+                    <option value="topic">📚 Topic Search</option>
                 </select>
                 
                 <button onclick="searchStories()" 
-                        class="px-8 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                    Search
+                        class="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg">
+                    🚀 Search
                 </button>
             </div>
 
-            <div id="messageDiv" class="hidden mt-4 p-4 rounded"></div>
+            <div id="messageDiv" class="hidden mt-4 p-4 rounded-lg"></div>
         </div>
 
-        <div id="loading" class="hidden text-center py-8">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-            <p class="text-gray-600 mt-4">Searching stories...</p>
+        <div id="loading" class="hidden text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500"></div>
+            <p class="text-gray-300 mt-4 text-lg">Searching stories with AI...</p>
         </div>
 
         <div id="resultsContainer"></div>
@@ -72,7 +86,7 @@
             const resultsContainer = document.getElementById('resultsContainer');
 
             if (!query) {
-                messageDiv.className = 'mt-4 p-4 rounded bg-yellow-100 text-yellow-800';
+                messageDiv.className = 'mt-4 p-4 rounded-lg bg-yellow-500/20 text-yellow-300 border border-yellow-500/50';
                 messageDiv.textContent = 'Please enter a search query';
                 messageDiv.classList.remove('hidden');
                 return;
@@ -100,13 +114,13 @@
                 if (response.ok) {
                     displayResults(data.results, data.query);
                 } else {
-                    messageDiv.className = 'mt-4 p-4 rounded bg-red-100 text-red-800';
-                    messageDiv.textContent = `Error: ${data.error}`;
+                    messageDiv.className = 'mt-4 p-4 rounded-lg bg-red-500/20 text-red-300 border border-red-500/50';
+                    messageDiv.innerHTML = `<strong>⚠ Error:</strong> ${data.error}`;
                     messageDiv.classList.remove('hidden');
                 }
             } catch (error) {
-                messageDiv.className = 'mt-4 p-4 rounded bg-red-100 text-red-800';
-                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.className = 'mt-4 p-4 rounded-lg bg-red-500/20 text-red-300 border border-red-500/50';
+                messageDiv.innerHTML = `<strong>⚠ Error:</strong> ${error.message}`;
                 messageDiv.classList.remove('hidden');
             } finally {
                 loading.classList.add('hidden');
@@ -118,52 +132,53 @@
             
             if (results.length === 0) {
                 resultsContainer.innerHTML = `
-                    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
-                        <p class="text-gray-600 text-lg">No stories found for "${query}"</p>
+                    <div class="glass rounded-2xl p-12 text-center">
+                        <div class="text-6xl mb-4">🔍</div>
+                        <p class="text-gray-300 text-xl">No stories found for "${query}"</p>
                     </div>
                 `;
                 return;
             }
 
             let html = `
-                <div class="mb-4 text-gray-700">
-                    Found <strong>${results.length}</strong> stories for "<strong>${query}</strong>"
+                <div class="mb-6 text-gray-300 text-lg">
+                    Found <strong class="text-purple-400">${results.length}</strong> stories for "<strong class="text-white">${query}</strong>"
                 </div>
             `;
 
             results.forEach(result => {
                 const emotionColors = {
-                    'joy': 'bg-yellow-100 text-yellow-800',
-                    'sadness': 'bg-blue-100 text-blue-800',
-                    'nostalgia': 'bg-purple-100 text-purple-800',
-                    'hope': 'bg-green-100 text-green-800',
-                    'fear': 'bg-red-100 text-red-800',
-                    'neutral': 'bg-gray-100 text-gray-800'
+                    'joy': 'from-yellow-500 to-orange-500',
+                    'sadness': 'from-blue-500 to-indigo-500',
+                    'nostalgia': 'from-purple-500 to-pink-500',
+                    'hope': 'from-green-500 to-emerald-500',
+                    'fear': 'from-red-500 to-rose-500',
+                    'neutral': 'from-gray-500 to-slate-500'
                 };
 
-                const emotionClass = emotionColors[result.emotion_tag] || emotionColors['neutral'];
+                const emotionGradient = emotionColors[result.emotion_tag] || emotionColors['neutral'];
 
                 html += `
-                    <div class="bg-white rounded-lg shadow-lg p-6 mb-4 hover:shadow-xl transition cursor-pointer"
+                    <div class="glass rounded-2xl p-6 mb-4 hover:scale-102 transition-all cursor-pointer shadow-lg"
                          onclick="window.location.href='/story/${result.story_id}'">
-                        <div class="flex justify-between items-start mb-3">
+                        <div class="flex justify-between items-start mb-4">
                             <div>
-                                <h3 class="text-xl font-bold text-gray-900">${result.speaker_name}</h3>
-                                <p class="text-sm text-gray-500">${result.district || 'Unknown'}</p>
+                                <h3 class="text-2xl font-bold text-white mb-1">${result.speaker_name}</h3>
+                                <p class="text-sm text-gray-400">${result.district || 'Unknown'}</p>
                             </div>
                             <div class="flex items-center space-x-2">
-                                <span class="px-3 py-1 rounded-full text-sm ${emotionClass}">
+                                <span class="px-3 py-1 rounded-full text-sm bg-gradient-to-r ${emotionGradient} text-white">
                                     ${result.emotion_tag}
                                 </span>
-                                <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
+                                <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/50">
                                     ${(result.similarity_score * 100).toFixed(1)}% match
                                 </span>
                             </div>
                         </div>
-                        <p class="text-gray-700 mb-2">${result.summary}</p>
-                        <div class="flex justify-between items-center text-sm text-gray-500">
-                            <span>${result.file_type === 'audio' ? '🎤 Audio' : '📝 Text'}</span>
-                            <span class="text-indigo-600 hover:text-indigo-800 font-semibold">View Full Story →</span>
+                        <p class="text-gray-300 mb-3 leading-relaxed">${result.summary}</p>
+                        <div class="flex justify-between items-center text-sm text-gray-400">
+                            <span>${result.file_type === 'audio' ? '🎤 Audio Story' : '📝 Text Story'}</span>
+                            <span class="text-purple-400 hover:text-purple-300 font-semibold">View Full Story →</span>
                         </div>
                     </div>
                 `;
