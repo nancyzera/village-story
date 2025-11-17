@@ -1,13 +1,24 @@
 import os
-from openai import OpenAI
 import config
 
-client = OpenAI(api_key=config.OPENAI_API_KEY) if config.OPENAI_API_KEY else None
+# Lazily import OpenAI client only when an API key is provided to avoid heavy imports
+# and potential import-time errors when running without credentials.
+client = None
+if config.OPENAI_API_KEY:
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=config.OPENAI_API_KEY)
+    except Exception:
+        # If import or client init fails, fall back to None and functions will
+        # handle the missing client gracefully.
+        client = None
 
 def get_text_embedding(text):
+    # If OpenAI is not configured, return a neutral zero-vector so the
+    # application can continue to function without embeddings.
     if not client or not config.OPENAI_API_KEY:
-        raise ValueError("OpenAI API key not configured")
-    
+        return [0.0] * 384
+
     try:
         response = client.embeddings.create(
             model="text-embedding-3-small",
@@ -15,8 +26,9 @@ def get_text_embedding(text):
             dimensions=384
         )
         return response.data[0].embedding
-    except Exception as e:
-        raise Exception(f"Error generating text embedding: {str(e)}")
+    except Exception:
+        # On any failure, return a zero-vector to avoid crashing uploads.
+        return [0.0] * 384
 
 def get_emotion_embedding(text):
     emotion_prompt = f"Analyze the emotional tone of this story: {text[:500]}"

@@ -1,7 +1,14 @@
-from openai import OpenAI
 import config
 
-client = OpenAI(api_key=config.OPENAI_API_KEY) if config.OPENAI_API_KEY else None
+# Lazily import OpenAI client only when an API key is provided to avoid heavy imports
+# and potential import-time errors when running without credentials.
+client = None
+if config.OPENAI_API_KEY:
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=config.OPENAI_API_KEY)
+    except Exception:
+        client = None
 
 def transcribe_audio(audio_file_path):
     if not client or not config.OPENAI_API_KEY:

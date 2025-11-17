@@ -1,5 +1,9 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv(Path(__file__).parent / '.env')
 
 BASE_DIR = Path(__file__).parent
 UPLOAD_FOLDER = BASE_DIR / 'uploads'

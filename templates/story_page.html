@@ -68,6 +68,12 @@
                     <span>{{ story.created_at }}</span>
                 </div>
 
+                {% if story.cover_image_filename %}
+                <div class="mb-6">
+                    <img src="/uploads/{{ story.cover_image_filename }}" alt="Cover image" class="w-full rounded-lg object-cover max-h-72">
+                </div>
+                {% endif %}
+
                 {% if story.transcription_text %}
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold text-purple-300 mb-3">📝 Transcription</h3>
@@ -89,6 +95,16 @@
                     <h3 class="text-xl font-semibold text-purple-300 mb-3">🎧 Original Audio</h3>
                     <audio controls class="w-full rounded-lg">
                         <source src="/uploads/{{ story.audio_filename }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                {% endif %}
+
+                {% if story.tts_audio_filename %}
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-purple-300 mb-3">🔊 Text → Voice</h3>
+                    <audio controls class="w-full rounded-lg">
+                        <source src="/uploads/{{ story.tts_audio_filename }}" type="audio/mpeg">
                         Your browser does not support the audio element.
                     </audio>
                 </div>

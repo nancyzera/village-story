@@ -83,6 +83,18 @@
         <p class="text-sm text-gray-400 mt-2">Accepted: MP3, WAV, OGG, M4A, FLAC (max 50MB)</p>
       </div>
 
+      <div class="mb-6">
+        <label class="block text-gray-400 font-semibold mb-2">Cover Image (optional)</label>
+        <input type="file" name="cover_image" id="cover_image" accept="image/*"
+               class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-700 file:text-white file:cursor-pointer hover:file:brightness-110">
+        <p class="text-sm text-gray-400 mt-2">Accepted: JPG, PNG, GIF, WEBP</p>
+      </div>
+
+      <div class="mb-6 flex items-center space-x-4">
+        <input type="checkbox" id="generate_tts" name="generate_tts" value="1" class="w-4 h-4">
+        <label for="generate_tts" class="text-gray-300">Generate audio from text (Text → Voice)</label>
+      </div>
+
       <button type="submit" id="submitBtn"
               class="w-full bg-purple-700 text-white font-bold py-4 rounded-lg hover:bg-purple-600 transition-all shadow-lg text-lg">
         🚀 Upload Story
