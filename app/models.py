@@ -28,7 +28,7 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS stories (
             id TEXT PRIMARY KEY,
-            user_id TEXT NOT NULL,
+            user_id TEXT,
             speaker_name TEXT NOT NULL,
             district TEXT,
             story_text TEXT NOT NULL,
@@ -42,6 +42,12 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
+    
+    # Add user_id column if it doesn't exist (for existing databases)
+    try:
+        cursor.execute('ALTER TABLE stories ADD COLUMN user_id TEXT')
+    except sqlite3.OperationalError:
+        pass
     
     # Add cover_image_filename and tts_audio_filename columns if they don't exist
     try:
