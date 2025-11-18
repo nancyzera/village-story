@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify, render_template
 from app.embeddings import get_text_embedding, get_emotion_embedding, get_topic_embedding
-from app.vector_db import search_stories
-from app.models import get_story, log_search
+from app.vector_db import search_stories, is_using_fallback
+from app.models import get_story, log_search, get_all_stories
+import re
 from app.utils.text_cleaner import extract_summary
 
 search_bp = Blueprint('search', __name__)
@@ -32,7 +33,46 @@ def search_api():
             return jsonify({'error': f'Failed to generate query embedding: {str(e)}'}), 500
         
         results = search_stories(query_vector, limit=limit, vector_name=search_type)
-        
+
+        # If we are running with the in-memory fallback (no qdrant client)
+        # or the qdrant search returned no results, perform a simple keyword
+        # search over the SQLite stories table so search remains usable.
+        if is_using_fallback() or not results:
+            # basic keyword scoring: count matches of query words in story_text
+            terms = [t for t in re.split(r"\W+", query.lower()) if t]
+            all_stories = get_all_stories(limit=1000)
+
+            scored = []
+            for s in all_stories:
+                text = (s.get('story_text') or '').lower()
+                score = 0
+                for t in terms:
+                    # weight longer terms slightly higher
+                    score += text.count(t) * (1 + len(t) / 10.0)
+                if score > 0:
+                    payload = {
+                        'story_id': s.get('id'),
+                        'speaker_name': s.get('speaker_name', 'Unknown'),
+                        'district': s.get('district', 'Unknown'),
+                        'story_text': s.get('story_text', ''),
+                        'emotion_tag': s.get('emotion_tag', 'neutral'),
+                        'timestamp': s.get('created_at', ''),
+                        'file_type': s.get('file_type', 'text')
+                    }
+                    scored.append((payload, float(score)))
+
+            # sort by score desc and limit
+            scored.sort(key=lambda x: x[1], reverse=True)
+            scored = scored[:limit]
+
+            # Build results similar to qdrant result objects expected by formatter
+            class _R:
+                def __init__(self, payload, score):
+                    self.payload = payload
+                    self.score = score
+
+            results = [ _R(p, s) for (p, s) in scored ]
+
         formatted_results = []
         for result in results:
             story_data = {
@@ -41,14 +81,14 @@ def search_api():
                 'district': result.payload.get('district', 'Unknown'),
                 'summary': extract_summary(result.payload.get('story_text', '')),
                 'emotion_tag': result.payload.get('emotion_tag', 'neutral'),
-                'similarity_score': round(result.score, 3),
+                'similarity_score': round(result.score, 3) if isinstance(result.score, (int, float)) else None,
                 'timestamp': result.payload.get('timestamp', ''),
                 'file_type': result.payload.get('file_type', 'text')
             }
             formatted_results.append(story_data)
-        
+
         log_search(query, len(formatted_results))
-        
+
         return jsonify({
             'success': True,
             'query': query,

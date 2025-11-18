@@ -29,10 +29,21 @@
   <nav class="glass sticky top-0 z-50 shadow-md py-3">
     <div class="max-w-6xl mx-auto flex justify-between items-center px-6">
       <span class="text-2xl font-bold">🌿 Memory of the Village</span>
-      <div class="space-x-4">
+      <div class="space-x-4 flex items-center">
         <a href="/" class="hover:text-purple-400 transition">Home</a>
-        <a href="/upload" class="hover:text-purple-400 transition">Upload</a>
-        <a href="/search" class="hover:text-purple-400 transition">Search</a>
+        {% if g.user %}
+          <a href="{{ url_for('upload_page') }}" class="hover:text-purple-400 transition">Upload</a>
+          <a href="/search" class="hover:text-purple-400 transition">Search</a>
+          <a href="{{ url_for('auth.profile') }}" class="hover:text-purple-400 transition">👤 {{ g.user.username }}</a>
+          <form method="POST" action="{{ url_for('auth.logout') }}" class="inline">
+            <button type="submit" class="text-red-400 hover:text-red-300 transition">Logout</button>
+          </form>
+        {% else %}
+          <a href="/upload" class="hover:text-purple-400 transition">Upload</a>
+          <a href="/search" class="hover:text-purple-400 transition">Search</a>
+          <a href="{{ url_for('auth.login') }}" class="hover:text-purple-400 transition">Login</a>
+          <a href="{{ url_for('auth.signup') }}" class="bg-purple-600 px-4 py-2 rounded hover:bg-purple-700 transition">Sign Up</a>
+        {% endif %}
       <!--  <a href="/settings" class="hover:text-purple-400 transition">Settings</a> -->
         <a href="/admin" class="hover:text-purple-400 transition">Admin</a>
       </div>

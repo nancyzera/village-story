@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template, current_app, url_for
+from flask import Blueprint, request, jsonify, render_template, current_app, url_for, session
 from werkzeug.utils import secure_filename
 import os
 import uuid
@@ -6,22 +6,30 @@ from datetime import datetime
 from pathlib import Path
 
 import config
-from app.models import save_story
+from app.models import save_story_with_user
 from app.embeddings import get_text_embedding, get_emotion_embedding, get_topic_embedding, detect_emotion
 from app.vector_db import store_story_vectors
 from app.utils.audio_to_text import transcribe_audio, is_audio_file
 from app.utils.text_cleaner import clean_text
 from app.utils.tts import synthesize_text_to_speech
+from app.routes.auth_routes import login_required
 
 upload_bp = Blueprint('upload', __name__)
 
 @upload_bp.route('/upload', methods=['GET'])
+@login_required
 def upload_page():
     return render_template('upload.html')
 
 @upload_bp.route('/api/upload', methods=['POST'])
+@login_required
 def upload_story():
     try:
+        # Get user_id from session
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': 'Authentication required'}), 401
+        
         speaker_name = request.form.get('speaker_name', '').strip()
         district = request.form.get('district', '').strip()
         story_text = request.form.get('story_text', '').strip()
@@ -88,8 +96,9 @@ def upload_story():
         except Exception as e:
             return jsonify({'error': f'Embedding generation failed: {str(e)}'}), 500
         
-        save_story(
+        save_story_with_user(
             story_id=story_id,
+            user_id=user_id,
             speaker_name=speaker_name,
             district=district,
             story_text=story_text,

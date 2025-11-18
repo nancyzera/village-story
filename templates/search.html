@@ -161,7 +161,7 @@
                 ${result.emotion_tag}
               </span>
               <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/50">
-                ${(result.similarity_score * 100).toFixed(1)}% match
+                ${result.similarity_score ? ( (result.similarity_score * 100).toFixed(1) + '% match') : 'N/A'}
               </span>
             </div>
           </div>
