@@ -32,7 +32,7 @@
       <div class="space-x-4 flex items-center">
         <a href="/" class="hover:text-purple-400 transition">Home</a>
         {% if g.user %}
-          <a href="{{ url_for('upload_page') }}" class="hover:text-purple-400 transition">Upload</a>
+          <a href="{{ url_for('upload.upload_page') }}" class="hover:text-purple-400 transition">Upload</a>
           <a href="/search" class="hover:text-purple-400 transition">Search</a>
           <a href="{{ url_for('auth.profile') }}" class="hover:text-purple-400 transition">👤 {{ g.user.username }}</a>
           <form method="POST" action="{{ url_for('auth.logout') }}" class="inline">

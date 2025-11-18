@@ -48,6 +48,11 @@ class _InMemoryQdrant:
         info['points_count'] = len(self.points)
 
     def search(self, collection_name, query_vector, limit=10):
+        # Handle tuple format (vector_name, vector) from multi-vector Qdrant API
+        if isinstance(query_vector, tuple):
+            vector_name, actual_vector = query_vector
+        else:
+            actual_vector = query_vector
         # Very simple: return empty list (no semantic ranking) so callers
         # receive a consistent type without errors.
         return []
