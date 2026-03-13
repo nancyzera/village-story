@@ -26,13 +26,15 @@
 <!-- Navbar -->
 <nav class="glass sticky top-0 z-50 shadow-md py-3">
   <div class="max-w-7xl mx-auto flex justify-between items-center px-6">
-    <span class="text-2xl font-bold">🌟 Memory of the Village</span>
+    <span class="text-2xl font-bold">Memory of the Village</span>
     <div class="space-x-4">
       <a href="/" class="hover:text-purple-400 transition">Home</a>
       <a href="/upload" class="hover:text-purple-400 transition">Upload</a>
       <a href="/search" class="text-purple-400 px-3 py-1 rounded bg-white/10">Search</a>
    <!--   <a href="/settings" class="hover:text-purple-400 transition">Settings</a>-->
-      <a href="/admin" class="hover:text-purple-400 transition">Admin</a>
+      {% if g.is_admin %}
+      <a href="/{{ g.admin_route }}" class="hover:text-purple-400 transition">Admin</a>
+      {% endif %}
     </div>
   </div>
 </nav>
@@ -40,7 +42,7 @@
 <!-- Search Panel -->
 <div class="max-w-5xl mx-auto px-6 py-12">
   <div class="glass rounded-2xl p-8 mb-6 shadow-2xl hover-glow">
-    <h2 class="text-4xl font-bold mb-6">🔍 Search Stories</h2>
+    <h2 class="text-4xl font-bold mb-6">Search Stories</h2>
 
     <div class="mb-4">
       <input type="text" id="searchInput" 
@@ -50,14 +52,14 @@
 
     <div class="flex space-x-4 mb-4">
       <select id="searchType" class="px-4 py-3 glass rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white">
-        <option value="text">🔤 Text Search</option>
-        <option value="emotion">💭 Emotion Search</option>
-        <option value="topic">📚 Topic Search</option>
+        <option value="text">Text Search</option>
+        <option value="emotion">Emotion Search</option>
+        <option value="topic">Topic Search</option>
       </select>
 
       <button onclick="searchStories()" 
               class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all shadow-lg">
-        🚀 Search
+        Search
       </button>
     </div>
 
@@ -108,12 +110,12 @@
         displayResults(data.results, data.query);
       } else {
         messageDiv.className = 'mt-4 p-4 rounded-lg bg-red-500/20 text-red-300 border border-red-500/50';
-        messageDiv.innerHTML = `<strong>⚠ Error:</strong> ${data.error}`;
+        messageDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
         messageDiv.classList.remove('hidden');
       }
     } catch (error) {
       messageDiv.className = 'mt-4 p-4 rounded-lg bg-red-500/20 text-red-300 border border-red-500/50';
-      messageDiv.innerHTML = `<strong>⚠ Error:</strong> ${error.message}`;
+      messageDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
       messageDiv.classList.remove('hidden');
     } finally {
       loading.classList.add('hidden');
@@ -126,7 +128,6 @@
     if (!results.length) {
       resultsContainer.innerHTML = `
         <div class="glass rounded-2xl p-12 text-center hover-glow">
-          <div class="text-6xl mb-4 animate-float">🔍</div>
           <p class="text-gray-400 text-xl">No stories found for "${query}"</p>
         </div>`;
       return;
@@ -167,7 +168,7 @@
           </div>
           <p class="text-gray-300 mb-3 leading-relaxed">${result.summary}</p>
           <div class="flex justify-between items-center text-sm text-gray-400">
-            <span>${result.file_type === 'audio' ? '🎤 Audio Story' : '📝 Text Story'}</span>
+            <span>${result.file_type === 'audio' ? 'Audio Story' : 'Text Story'}</span>
             <span class="text-purple-400 hover:text-purple-300 font-semibold">View Full Story →</span>
           </div>
         </div>`;

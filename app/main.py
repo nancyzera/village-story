@@ -9,7 +9,7 @@ from app.models import init_db, get_all_stories, get_user_by_id
 from app.vector_db import init_qdrant, get_collection_info
 from app.routes.upload_routes import upload_bp
 from app.routes.search_routes import search_bp
-from app.routes.auth_routes import auth_bp
+from app.routes.auth_routes import auth_bp, admin_required, is_admin_user
 
 app = Flask(__name__, 
             template_folder='../templates',
@@ -37,6 +37,8 @@ def load_user_context():
         g.user = get_user_by_id(session['user_id'])
     else:
         g.user = None
+    g.is_admin = is_admin_user(session)
+    g.admin_route = config.ADMIN_ROUTE
 
 # Serve uploaded files from the uploads folder. Using an explicit route keeps
 # uploads out of the main static folder and allows OneDrive/workspace paths.
@@ -58,7 +60,8 @@ def settings():
                          openai_configured=bool(config.OPENAI_API_KEY),
                          qdrant_url=config.QDRANT_URL)
 
-@app.route('/admin')
+@app.route(f'/{config.ADMIN_ROUTE}')
+@admin_required
 def admin():
     try:
         stories = get_all_stories(limit=50)

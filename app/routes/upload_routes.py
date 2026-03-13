@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 import config
-from app.models import save_story_with_user
+from app.models import save_story_with_user, add_chapter
 from app.embeddings import get_text_embedding, get_emotion_embedding, get_topic_embedding, detect_emotion
 from app.vector_db import store_story_vectors
 from app.utils.audio_to_text import transcribe_audio, is_audio_file
@@ -33,6 +33,10 @@ def upload_story():
         speaker_name = request.form.get('speaker_name', '').strip()
         district = request.form.get('district', '').strip()
         story_text = request.form.get('story_text', '').strip()
+        chapter_title = request.form.get('chapter_title', '').strip()
+        story_status = request.form.get('story_status', 'in_progress').strip().lower()
+        if story_status not in ('in_progress', 'completed'):
+            story_status = 'in_progress'
         
         if not speaker_name:
             return jsonify({'error': 'Speaker name is required'}), 400
@@ -107,8 +111,14 @@ def upload_story():
             cover_image_filename=cover_image_filename,
             tts_audio_filename=tts_audio_filename,
             emotion_tag=emotion_tag,
-            file_type=file_type
+            file_type=file_type,
+            status=story_status
         )
+
+        # Create the first chapter entry for this story
+        if not chapter_title:
+            chapter_title = "Chapter 1"
+        add_chapter(story_id, 1, chapter_title, story_text)
         
         metadata = {
             'speaker_name': speaker_name,

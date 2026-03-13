@@ -11,28 +11,19 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 min-h-screen text-white">
-    <nav class="glass sticky top-0 z-50 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold gradient-text">🌟 Memory of the Village</span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Home</a>
-                    <a href="/upload" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Upload</a>
-                    <a href="/search" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Search</a>
-                   <!-- <a href="/settings" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Settings</a>-->
-                    <a href="/admin" class="text-gray-300 hover:text-purple-400 px-3 py-2 rounded-lg transition-all hover:bg-white/10">Admin</a>
-                </div>
+<body class="bg-gray-900 min-h-screen text-white font-sans">
+    <nav class="glass sticky top-0 z-50 shadow-md py-3">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-6">
+            <span class="text-2xl font-bold">Memory of the Village</span>
+            <div class="flex items-center space-x-4">
+                <a href="/" class="text-gray-300 hover:text-purple-400 transition">Home</a>
+                <a href="/upload" class="text-gray-300 hover:text-purple-400 transition">Upload</a>
+                <a href="/search" class="text-gray-300 hover:text-purple-400 transition">Search</a>
+                {% if g.is_admin %}
+                <a href="/{{ g.admin_route }}" class="text-gray-300 hover:text-purple-400 transition">Admin</a>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -48,35 +39,40 @@
             <div class="mb-8">
                 <div class="flex justify-between items-start">
                     <div>
-                        <h1 class="text-4xl font-bold mb-2 gradient-text">{{ story.speaker_name }}</h1>
+                        <h1 class="text-4xl font-bold mb-2">{{ story.speaker_name }}</h1>
                         <p class="text-gray-400 text-lg">{{ story.district or 'Unknown Location' }}</p>
                     </div>
-                    {% if story.emotion_tag %}
-                    <span class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-semibold shadow-lg">
-                        {{ story.emotion_tag }}
-                    </span>
-                    {% endif %}
+                    <div class="flex items-center gap-2">
+                        {% if story.emotion_tag %}
+                        <span class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-semibold shadow-lg">
+                            {{ story.emotion_tag }}
+                        </span>
+                        {% endif %}
+                        <span class="px-3 py-1 rounded-full text-xs border border-white/20 text-gray-200">
+                            {{ 'Completed' if story.status == 'completed' else 'In Progress' }}
+                        </span>
+                    </div>
                 </div>
             </div>
 
             <div class="border-t border-white/10 pt-6 mb-6">
                 <div class="flex items-center space-x-4 text-sm text-gray-400 mb-6">
                     <span class="flex items-center">
-                        {{ story.file_type or 'text' == 'audio' and '🎤 Audio Story' or '📝 Written Story' }}
+                        {{ story.file_type or 'text' == 'audio' and 'Audio Story' or 'Written Story' }}
                     </span>
                     <span>•</span>
                     <span>{{ story.created_at }}</span>
                 </div>
 
                 {% if story.cover_image_filename %}
-                <div class="mb-6">
-                    <img src="/uploads/{{ story.cover_image_filename }}" alt="Cover image" class="w-full rounded-lg object-cover max-h-72">
+                <div class="mb-8">
+                    <img src="/uploads/{{ story.cover_image_filename }}" alt="Cover image" class="w-full max-w-4xl max-h-[70vh] object-cover rounded-lg mx-auto">
                 </div>
                 {% endif %}
 
                 {% if story.transcription_text %}
                 <div class="mb-8">
-                    <h3 class="text-xl font-semibold text-purple-300 mb-3">📝 Transcription</h3>
+                    <h3 class="text-xl font-semibold text-purple-300 mb-3">Transcription</h3>
                     <div class="bg-white/5 rounded-lg p-6 border border-white/10">
                         <p class="text-gray-300 whitespace-pre-line leading-relaxed">{{ story.transcription_text }}</p>
                     </div>
@@ -84,15 +80,33 @@
                 {% endif %}
 
                 <div class="mb-8">
-                    <h3 class="text-xl font-semibold text-purple-300 mb-3">📖 Story</h3>
-                    <div class="prose max-w-none">
-                        <p class="text-gray-200 text-lg leading-relaxed whitespace-pre-line">{{ story.story_text }}</p>
+                    <h3 class="text-xl font-semibold text-purple-300 mb-3">Chapters</h3>
+                    <div class="space-y-6">
+                        {% for ch in chapters %}
+                        <div class="bg-white/5 rounded-lg p-6 border border-white/10">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-lg font-semibold text-white">
+                                    {{ ch.title or ('Chapter ' ~ ch.chapter_number) }}
+                                </h4>
+                                <span class="text-xs text-gray-400">{{ ch.created_at }}</span>
+                            </div>
+                            <p class="text-gray-200 leading-relaxed whitespace-pre-line">{{ ch.content }}</p>
+                            {% if ch.tts_audio_filename %}
+                            <div class="mt-4">
+                                <audio controls class="w-full rounded-lg">
+                                    <source src="/uploads/{{ ch.tts_audio_filename }}" type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
 
                 {% if story.audio_filename %}
                 <div class="mb-8">
-                    <h3 class="text-xl font-semibold text-purple-300 mb-3">🎧 Original Audio</h3>
+                    <h3 class="text-xl font-semibold text-purple-300 mb-3">Original Audio</h3>
                     <audio controls class="w-full rounded-lg">
                         <source src="/uploads/{{ story.audio_filename }}" type="audio/mpeg">
                         Your browser does not support the audio element.
@@ -102,7 +116,7 @@
 
                 {% if story.tts_audio_filename %}
                 <div class="mb-8">
-                    <h3 class="text-xl font-semibold text-purple-300 mb-3">🔊 Text → Voice</h3>
+                    <h3 class="text-xl font-semibold text-purple-300 mb-3">Text to Voice</h3>
                     <audio controls class="w-full rounded-lg">
                         <source src="/uploads/{{ story.tts_audio_filename }}" type="audio/mpeg">
                         Your browser does not support the audio element.
@@ -120,6 +134,59 @@
                 </div>
             </div>
         </div>
+
+        {% if is_owner %}
+        <div class="glass rounded-2xl p-8 shadow-2xl mt-8">
+            <h3 class="text-2xl font-bold mb-4">Add New Chapter</h3>
+            <form method="POST" action="{{ url_for('search.add_story_chapter', story_id=story.id) }}">
+                <div class="mb-4">
+                    <label class="block text-gray-300 font-semibold mb-2">Chapter Title (optional)</label>
+                    <input type="text" name="chapter_title"
+                           class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500"
+                           placeholder="Chapter title">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-300 font-semibold mb-2">Chapter Content</label>
+                    <textarea name="chapter_content" rows="8" required
+                              class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500"
+                              placeholder="Write the next chapter..."></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-300 font-semibold mb-2">Story Status</label>
+                    <select name="story_status"
+                            class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white">
+                        <option value="in_progress" {% if story.status != 'completed' %}selected{% endif %}>In Progress</option>
+                        <option value="completed" {% if story.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                <div class="mb-6 flex items-center gap-3">
+                    <input type="checkbox" id="generate_tts" name="generate_tts" value="1" class="w-4 h-4">
+                    <label for="generate_tts" class="text-gray-300">Generate audio from chapter text</label>
+                </div>
+                <button type="submit"
+                        class="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition">
+                    Add Chapter
+                </button>
+            </form>
+        </div>
+
+        <div class="glass rounded-2xl p-8 shadow-2xl mt-6">
+            <h3 class="text-2xl font-bold mb-4">Update Story Status</h3>
+            <form method="POST" action="{{ url_for('search.update_story_status_route', story_id=story.id) }}">
+                <div class="flex items-center gap-4">
+                    <select name="status"
+                            class="flex-1 px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white">
+                        <option value="in_progress" {% if story.status != 'completed' %}selected{% endif %}>In Progress</option>
+                        <option value="completed" {% if story.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                    <button type="submit"
+                            class="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition">
+                        Update
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>

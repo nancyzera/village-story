@@ -25,13 +25,13 @@
 <!-- Navbar -->
 <nav class="glass sticky top-0 z-50 shadow-md py-3">
   <div class="max-w-7xl mx-auto flex justify-between items-center px-6">
-    <span class="text-2xl font-bold">🌿 Memory of the Village</span>
+    <span class="text-2xl font-bold">Memory of the Village</span>
     <div class="space-x-4 flex items-center">
       <a href="/" class="hover:text-purple-400 transition">Home</a>
       <a href="/upload" class="text-purple-400 px-2 py-1 rounded bg-white/10">Upload</a>
       <a href="/search" class="hover:text-purple-400 transition">Search</a>
       {% if g.user %}
-        <a href="{{ url_for('auth.profile') }}" class="hover:text-purple-400 transition">👤 {{ g.user.username }}</a>
+        <a href="{{ url_for('auth.profile') }}" class="hover:text-purple-400 transition">{{ g.user.username }}</a>
         <form method="POST" action="{{ url_for('auth.logout') }}" class="inline">
           <button type="submit" class="text-red-400 hover:text-red-300 transition">Logout</button>
         </form>
@@ -39,7 +39,9 @@
         <a href="{{ url_for('auth.login') }}" class="hover:text-purple-400 transition">Login</a>
       {% endif %}
    <!--   <a href="/settings" class="hover:text-purple-400 transition">Settings</a>-->
-      <a href="/admin" class="hover:text-purple-400 transition">Admin</a>
+      {% if g.is_admin %}
+      <a href="/{{ g.admin_route }}" class="hover:text-purple-400 transition">Admin</a>
+      {% endif %}
     </div>
   </div>
 </nav>
@@ -47,7 +49,7 @@
 <!-- Upload Form -->
 <div class="max-w-3xl mx-auto px-6 py-12">
   <div class="glass rounded-2xl p-8 shadow-lg hover-glow">
-    <h2 class="text-4xl font-bold mb-6">📝 Share Your Story</h2>
+    <h2 class="text-4xl font-bold mb-6">Share Your Story</h2>
 
     <div id="messageDiv" class="hidden mb-4 p-4 rounded-lg"></div>
 
@@ -69,11 +71,11 @@
       <div class="mb-6 flex space-x-4">
         <button type="button" id="textBtn" onclick="showTextInput()"
                 class="flex-1 px-6 py-3 bg-purple-700 text-white rounded-lg font-semibold hover:bg-purple-600 transition-all shadow-lg">
-            📝 Write Text
+            Write Text
         </button>
         <button type="button" id="audioBtn" onclick="showAudioInput()"
                 class="flex-1 px-6 py-3 bg-white/10 text-gray-300 rounded-lg font-semibold hover:bg-white/20 transition-all border border-white/20">
-            🎤 Upload Audio
+            Upload Audio
         </button>
       </div>
 
@@ -82,6 +84,22 @@
         <textarea name="story_text" id="story_text" rows="8"
                   class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500"
                   placeholder="Write your story here..."></textarea>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-400 font-semibold mb-2">Chapter Title (optional)</label>
+        <input type="text" name="chapter_title" id="chapter_title"
+               class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500"
+               placeholder="Chapter 1">
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-400 font-semibold mb-2">Story Status</label>
+        <select name="story_status" id="story_status"
+                class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white">
+          <option value="in_progress" selected>In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
       </div>
 
       <div id="audioInput" class="mb-6 hidden">
@@ -105,7 +123,7 @@
 
       <button type="submit" id="submitBtn"
               class="w-full bg-purple-700 text-white font-bold py-4 rounded-lg hover:bg-purple-600 transition-all shadow-lg text-lg">
-        🚀 Upload Story
+        Upload Story
       </button>
     </form>
 
@@ -150,17 +168,17 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
 
     if (response.ok) {
       messageDiv.className = 'mb-4 p-4 rounded-lg bg-green-500/20 text-green-300 border border-green-500/50';
-      messageDiv.innerHTML = `<strong>✓ Success!</strong> Story uploaded with emotion: <span class="font-bold">${data.emotion_tag}</span>`;
+      messageDiv.innerHTML = `<strong>Success:</strong> Story uploaded with emotion: <span class="font-bold">${data.emotion_tag}</span>`;
       messageDiv.classList.remove('hidden');
       e.target.reset();
     } else {
       messageDiv.className = 'mb-4 p-4 rounded-lg bg-red-500/20 text-red-300 border border-red-500/50';
-      messageDiv.innerHTML = `<strong>⚠ Error:</strong> ${data.error}`;
+      messageDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
       messageDiv.classList.remove('hidden');
     }
   } catch (error) {
     messageDiv.className = 'mb-4 p-4 rounded-lg bg-red-500/20 text-red-300 border border-red-500/50';
-    messageDiv.innerHTML = `<strong>⚠ Error:</strong> ${error.message}`;
+    messageDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
     messageDiv.classList.remove('hidden');
   } finally {
     loading.classList.add('hidden');

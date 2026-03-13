@@ -1,9 +1,15 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, session, g, abort, current_app
 from app.embeddings import get_text_embedding, get_emotion_embedding, get_topic_embedding
 from app.vector_db import search_stories, is_using_fallback
-from app.models import get_story, log_search, get_all_stories
+from app.models import (
+    get_story, log_search, get_all_stories, get_story_chapters,
+    get_next_chapter_number, add_chapter, append_story_text, update_story_status
+)
 import re
 from app.utils.text_cleaner import extract_summary
+from app.utils.tts import synthesize_text_to_speech
+import config
+from app.routes.auth_routes import login_required
 
 search_bp = Blueprint('search', __name__)
 
@@ -104,7 +110,75 @@ def story_page(story_id):
     story = get_story(story_id)
     if not story:
         return "Story not found", 404
-    return render_template('story_page.html', story=story)
+    chapters = get_story_chapters(story_id)
+    if not chapters:
+        chapters = [{
+            'chapter_number': 1,
+            'title': 'Chapter 1',
+            'content': story.get('story_text', ''),
+            'created_at': story.get('created_at', '')
+        }]
+    is_owner = bool(g.user and g.user.get('id') == story.get('user_id'))
+    status = story.get('status') or 'in_progress'
+    story['status'] = status
+    return render_template('story_page.html', story=story, chapters=chapters, is_owner=is_owner)
+
+@search_bp.route('/story/<story_id>/chapters', methods=['POST'])
+@login_required
+def add_story_chapter(story_id):
+    story = get_story(story_id)
+    if not story:
+        return "Story not found", 404
+    user_id = session.get('user_id')
+    if not user_id or story.get('user_id') != user_id:
+        abort(404)
+
+    chapter_title = request.form.get('chapter_title', '').strip()
+    chapter_content = request.form.get('chapter_content', '').strip()
+    generate_tts = request.form.get('generate_tts') in ('1', 'true', 'on')
+    if not chapter_content:
+        return "Chapter content is required", 400
+
+    chapter_number = get_next_chapter_number(story_id)
+    if not chapter_title:
+        chapter_title = f"Chapter {chapter_number}"
+
+    chapter_tts_filename = None
+    if generate_tts:
+        try:
+            tts_filename = f"{story_id}_ch{chapter_number}_tts.mp3"
+            tts_path = config.UPLOAD_FOLDER / tts_filename
+            config.UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+            ok = synthesize_text_to_speech(chapter_content, str(tts_path))
+            if ok:
+                chapter_tts_filename = tts_filename
+        except Exception as e:
+            current_app.logger.warning(f"Chapter TTS generation failed for {story_id}: {e}")
+
+    add_chapter(story_id, chapter_number, chapter_title, chapter_content, chapter_tts_filename)
+    append_story_text(story_id, chapter_number, chapter_title, chapter_content)
+
+    new_status = request.form.get('story_status', '').strip().lower()
+    if new_status in ('in_progress', 'completed'):
+        update_story_status(story_id, new_status)
+
+    return redirect(url_for('search.story_page', story_id=story_id))
+
+@search_bp.route('/story/<story_id>/status', methods=['POST'])
+@login_required
+def update_story_status_route(story_id):
+    story = get_story(story_id)
+    if not story:
+        return "Story not found", 404
+    user_id = session.get('user_id')
+    if not user_id or story.get('user_id') != user_id:
+        abort(404)
+
+    new_status = request.form.get('status', '').strip().lower()
+    if new_status not in ('in_progress', 'completed'):
+        return "Invalid status", 400
+    update_story_status(story_id, new_status)
+    return redirect(url_for('search.story_page', story_id=story_id))
 
 @search_bp.route('/api/story/<story_id>', methods=['GET'])
 def get_story_api(story_id):

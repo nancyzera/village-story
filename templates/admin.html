@@ -24,13 +24,13 @@
 
 <nav class="glass sticky top-0 z-50 shadow-md py-3">
   <div class="max-w-7xl mx-auto flex justify-between items-center px-6">
-    <span class="text-2xl font-bold">🌿 Memory of the Village</span>
+    <span class="text-2xl font-bold">Memory of the Village</span>
     <div class="space-x-4">
       <a href="/" class="hover:text-purple-400 transition">Home</a>
       <a href="/upload" class="hover:text-purple-400 transition">Upload</a>
       <a href="/search" class="hover:text-purple-400 transition">Search</a>
  <!--     <a href="/settings" class="hover:text-purple-400 transition">Settings<a/>-->
-      <a href="/admin" class="text-purple-400 px-2 py-1 rounded bg-white/10">Admin</a>
+      <a href="/{{ g.admin_route }}" class="text-purple-400 px-2 py-1 rounded bg-white/10">Admin</a>
     </div>
   </div>
 </nav>
@@ -38,17 +38,14 @@
 
 <div class="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-6">
   <div class="glass rounded-xl p-6 text-center hover-glow">
-    <div class="text-5xl mb-2 animate-float">📚</div>
     <h3 class="text-3xl font-bold">{{ total_stories }}</h3>
     <p class="text-gray-400">Total Stories</p>
   </div>
   <div class="glass rounded-xl p-6 text-center hover-glow">
-    <div class="text-5xl mb-2 animate-float">🗄️</div>
     <h3 class="text-3xl font-bold">{{ qdrant_info.points_count or 0 }}</h3>
     <p class="text-gray-400">Vector Points</p>
   </div>
   <div class="glass rounded-xl p-6 text-center hover-glow">
-    <div class="text-5xl mb-2 animate-float">✅</div>
     <h3 class="text-3xl font-bold">{{ qdrant_info.status or 'Active' }}</h3>
     <p class="text-gray-400">System Status</p>
   </div>
@@ -76,7 +73,7 @@
           <td class="px-4 py-2 text-sm font-medium">{{ story.speaker_name }}</td>
           <td class="px-4 py-2 text-sm text-gray-400">{{ story.district or 'N/A' }}</td>
           <td class="px-4 py-2 text-sm text-gray-400">
-            {{ story.file_type or 'text' == 'audio' and '🎤 Audio' or '📝 Text' }}
+            {{ story.file_type or 'text' == 'audio' and 'Audio' or 'Text' }}
           </td>
           <td class="px-4 py-2 text-sm">
             <span class="px-2 py-1 text-xs rounded-full bg-white/10 text-gray-200">{{ story.emotion_tag or 'neutral' }}</span>
@@ -92,7 +89,6 @@
   </div>
   {% else %}
   <div class="text-center py-12">
-    <div class="text-6xl mb-4">📭</div>
     <p class="text-gray-400 text-lg">No stories uploaded yet.</p>
   </div>
   {% endif %}

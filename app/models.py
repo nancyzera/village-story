@@ -1,7 +1,9 @@
 import sqlite3
+import uuid
 from datetime import datetime
 from pathlib import Path
 import config
+from werkzeug.security import generate_password_hash
 
 def get_db_connection():
     conn = sqlite3.connect(config.DATABASE_PATH)
@@ -24,6 +26,26 @@ def init_db():
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # Ensure default admin user exists (for local/dev)
+    if config.ADMIN_DEFAULT_USERNAME and config.ADMIN_DEFAULT_PASSWORD:
+        cursor.execute('SELECT id FROM users WHERE username = ?', (config.ADMIN_DEFAULT_USERNAME,))
+        existing = cursor.fetchone()
+        if not existing:
+            cursor.execute('SELECT id FROM users WHERE email = ?', (config.ADMIN_DEFAULT_EMAIL,))
+            email_in_use = cursor.fetchone()
+            admin_email = config.ADMIN_DEFAULT_EMAIL
+            if email_in_use:
+                admin_email = f"admin+{uuid.uuid4().hex[:8]}@local"
+            cursor.execute('''
+                INSERT INTO users (id, username, email, password_hash)
+                VALUES (?, ?, ?, ?)
+            ''', (
+                str(uuid.uuid4()),
+                config.ADMIN_DEFAULT_USERNAME,
+                admin_email,
+                generate_password_hash(config.ADMIN_DEFAULT_PASSWORD)
+            ))
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS stories (
@@ -38,6 +60,7 @@ def init_db():
             tts_audio_filename TEXT,
             emotion_tag TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'in_progress',
             file_type TEXT,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
@@ -59,6 +82,29 @@ def init_db():
         cursor.execute('ALTER TABLE stories ADD COLUMN tts_audio_filename TEXT')
     except sqlite3.OperationalError:
         pass
+
+    try:
+        cursor.execute("ALTER TABLE stories ADD COLUMN status TEXT DEFAULT 'in_progress'")
+    except sqlite3.OperationalError:
+        pass
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS story_chapters (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            story_id TEXT NOT NULL,
+            chapter_number INTEGER NOT NULL,
+            title TEXT,
+            content TEXT NOT NULL,
+            tts_audio_filename TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (story_id) REFERENCES stories(id)
+        )
+    ''')
+
+    try:
+        cursor.execute("ALTER TABLE story_chapters ADD COLUMN tts_audio_filename TEXT")
+    except sqlite3.OperationalError:
+        pass
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS search_logs (
@@ -74,17 +120,17 @@ def init_db():
 
 def save_story(story_id, speaker_name, district, story_text, transcription_text=None, 
                audio_filename=None, cover_image_filename=None, tts_audio_filename=None,
-               emotion_tag=None, file_type='text'):
+               emotion_tag=None, file_type='text', status='in_progress'):
     conn = get_db_connection()
     cursor = conn.cursor()
     
     cursor.execute('''
         INSERT INTO stories (id, speaker_name, district, story_text, transcription_text,
                            audio_filename, cover_image_filename, tts_audio_filename,
-                           emotion_tag, file_type)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           emotion_tag, status, file_type)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (story_id, speaker_name, district, story_text, transcription_text,
-          audio_filename, cover_image_filename, tts_audio_filename, emotion_tag, file_type))
+          audio_filename, cover_image_filename, tts_audio_filename, emotion_tag, status, file_type))
     
     conn.commit()
     conn.close()
@@ -170,7 +216,7 @@ def get_user_stories(user_id, limit=100):
 # Update save_story to accept user_id
 def save_story_with_user(story_id, user_id, speaker_name, district, story_text, transcription_text=None, 
                          audio_filename=None, cover_image_filename=None, tts_audio_filename=None,
-                         emotion_tag=None, file_type='text'):
+                         emotion_tag=None, file_type='text', status='in_progress'):
     """Save a story with user_id"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -178,11 +224,64 @@ def save_story_with_user(story_id, user_id, speaker_name, district, story_text, 
     cursor.execute('''
         INSERT INTO stories (id, user_id, speaker_name, district, story_text, transcription_text,
                            audio_filename, cover_image_filename, tts_audio_filename,
-                           emotion_tag, file_type)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           emotion_tag, status, file_type)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (story_id, user_id, speaker_name, district, story_text, transcription_text,
-          audio_filename, cover_image_filename, tts_audio_filename, emotion_tag, file_type))
+          audio_filename, cover_image_filename, tts_audio_filename, emotion_tag, status, file_type))
     
     conn.commit()
     conn.close()
 
+def get_story_chapters(story_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT chapter_number, title, content, tts_audio_filename, created_at
+        FROM story_chapters
+        WHERE story_id = ?
+        ORDER BY chapter_number ASC
+    ''', (story_id,))
+    chapters = cursor.fetchall()
+    conn.close()
+    return [dict(ch) for ch in chapters]
+
+def get_next_chapter_number(story_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT MAX(chapter_number) AS max_num FROM story_chapters WHERE story_id = ?', (story_id,))
+    row = cursor.fetchone()
+    conn.close()
+    max_num = row['max_num'] if row and row['max_num'] is not None else 0
+    return int(max_num) + 1
+
+def add_chapter(story_id, chapter_number, title, content, tts_audio_filename=None):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO story_chapters (story_id, chapter_number, title, content, tts_audio_filename)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (story_id, chapter_number, title, content, tts_audio_filename))
+    conn.commit()
+    conn.close()
+
+def update_story_status(story_id, status):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE stories SET status = ? WHERE id = ?', (status, story_id))
+    conn.commit()
+    conn.close()
+
+def append_story_text(story_id, chapter_number, title, content):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT story_text FROM stories WHERE id = ?', (story_id,))
+    row = cursor.fetchone()
+    current = row['story_text'] if row and row['story_text'] else ''
+    header = f"Chapter {chapter_number}"
+    if title:
+        header = f"{header}: {title}"
+    addition = f"{header}\n{content}"
+    new_text = current + "\n\n" + addition if current else content
+    cursor.execute('UPDATE stories SET story_text = ? WHERE id = ?', (new_text, story_id))
+    conn.commit()
+    conn.close()

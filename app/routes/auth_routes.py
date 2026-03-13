@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, session, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, session, url_for, jsonify, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
+import config
 from app.models import (
     create_user, get_user_by_username, get_user_by_email, 
     get_user_by_id, get_user_stories
@@ -74,6 +75,7 @@ def signup():
         # Log user in automatically
         session['user_id'] = user_id
         session['username'] = username
+        session['email'] = email
         
         if request.is_json:
             return jsonify({'success': True, 'user_id': user_id}), 201
@@ -187,4 +189,30 @@ def login_required(f):
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     
+    return decorated_function
+
+def is_admin_user(sess):
+    """Check if session belongs to an admin user"""
+    user_id = (sess.get('user_id') or '').strip()
+    username = (sess.get('username') or '').strip().lower()
+    email = (sess.get('email') or '').strip().lower()
+
+    if user_id and user_id in config.ADMIN_USER_IDS:
+        return True
+    if username and username in config.ADMIN_USERNAMES:
+        return True
+    if email and email in config.ADMIN_EMAILS:
+        return True
+    return False
+
+def admin_required(f):
+    """Decorator to require admin access for a route; returns 404 to hide route"""
+    from functools import wraps
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not is_admin_user(session):
+            abort(404)
+        return f(*args, **kwargs)
+
     return decorated_function
