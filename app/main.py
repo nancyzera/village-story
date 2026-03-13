@@ -95,6 +95,8 @@ def create_app():
     init_qdrant()
     return app
 
+# Ensure DB/Qdrant init for WSGI servers like gunicorn
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(host='0.0.0.0', port=5000, debug=True)
