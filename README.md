@@ -6,7 +6,7 @@ A full-stack web application for preserving and discovering village stories thro
 
 - **Upload Stories**: Share memories via voice recordings or written text
 - **Audio Transcription**: Automatic transcription using OpenAI Whisper
-- **Semantic Search**: Find stories by meaning, not just keywords
+- **Semantic Search**: Find stories by meaning, not just keywords.
 - **Emotion Detection**: AI-powered emotion tagging
 - **Vector Storage**: Stories stored as embeddings in Qdrant vector database
 - **Beautiful UI**: Clean, responsive design with TailwindCSS
